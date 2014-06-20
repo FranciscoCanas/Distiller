@@ -117,7 +117,6 @@ class Distiller():
         Compute the statistics for each pre-processed document, given the entire body of docs.
         """
         for document in self.processed_documents.values():
-            print document
             document['tfidf'] = self.tfidf.compute_tf_idf(document['candidates'],
                                                            document['tokenized_body'],
                                                            self.processed_doc_bodies)
