@@ -1,1 +1,2 @@
+v0.1.1, 2014-06-20 -- Package reorganization, test data, basic test added.
 v0.1, 2014-06-19 -- Initial Release.

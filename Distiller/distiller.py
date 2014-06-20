@@ -1,10 +1,12 @@
 import os
 import json
+
 import nltk
-from distiller.src.features.Collocations import Collocations
-from distiller.src.features.Positioning import Positioning
-from distiller.src.features.tf_idf import tf_idf
-from distiller.src.preprocessors.preprocessing import pre_process_pipeline
+
+from features.Collocations import Collocations
+from features.Positioning import Positioning
+from features.tf_idf import tf_idf
+from preprocessing.pipeline import pre_process_pipeline
 
 
 __author__ = 'fcanas'
@@ -78,7 +80,7 @@ class Distiller():
 
     def initialize_arguments(self, nlp_args):
         """
-        Read args from json metadata and initialize distiller arguments.
+        Read args from json metadata and initialize Distiller arguments.
         """
         self.base_url = self.jdata['metadata']['base_url']
         self.documents = self.jdata['documents']
