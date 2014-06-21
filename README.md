@@ -1,11 +1,11 @@
-Keyword Extractor
-=================
+Distiller
+=========
 
 Distiller provides convenient auto-extraction of document key words
 based on term-frequency/inverse-document-frequency (TF-IDF) and word
 positioning.
 
-Extractor handles all of the pre-processing details and produces final
+Distiller handles all of the pre-processing details and produces final
 statistic reports in JSON format.
 
 
