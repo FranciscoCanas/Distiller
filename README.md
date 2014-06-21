@@ -19,7 +19,8 @@ Installation
 ------------
 
 Installation using pip:
-$ pip install Distiller
+
+    $ pip install Distiller
 
 
 Usage
