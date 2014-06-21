@@ -58,7 +58,16 @@ class Distiller():
 
     """
 
-    def __init__(self, document_file, target_path, nlp_args):
+    default_args = {
+        'normalize': True,          # normalize tokens during pre processing
+        'stem': True,               # stems tokens during pre processing
+        'lemmatize': False,         # lemmatize during pre processing
+        'tfidf_cutoff': 0.001,      # cutoff value to use for term-freq/doc-freq score
+        'pos_list': ['NN','NNP'],   # POS white list used to filter for candidates
+        'black_list': []            # token list used to filter out from candidates
+    }
+
+    def __init__(self, document_file, target_path, nlp_args=default_args):
         """
         Initialize Distiller for specified document file.
         """

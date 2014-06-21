@@ -15,7 +15,7 @@ setup(
         url='https://github.com/FranciscoCanas/Distiller',
         license='LICENSE.txt',
         description='Automatic Keyword Extraction from Document Collections',
-        long_description=open('README.txt').read(),
+        long_description=open('README.md').read(),
         install_requires=[
                 "nltk >= 2.0.4"
             ]
