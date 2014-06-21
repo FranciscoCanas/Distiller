@@ -14,6 +14,18 @@ Requirements
 
 Distiller uses the [Natural Language Toolkit](http://www.nltk.org/)
 
+You will need to download a couple of NLTK packages:
+
+    >>> import nltk
+    >>> nltk.download()
+    Downloader> d
+    Download which package (l=list; x=cancel)?
+        Identifier> maxent_treebank_pos_tagger
+    Downloader> d
+    Download which package (l=list; x=cancel)?
+        Identifier> stopwords
+
+
 
 Installation
 ------------
