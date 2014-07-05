@@ -1,12 +1,13 @@
 import os
 import json
-
+import logging
 import nltk
 
 from features.Collocations import Collocations
 from features.Positioning import Positioning
 from features.tf_idf import tf_idf
 from preprocessing.pipeline import pre_process_pipeline
+
 
 
 __author__ = 'fcanas'
@@ -67,7 +68,7 @@ class Distiller():
         'black_list': []            # token list used to filter out from candidates
     }
 
-    def __init__(self, document_file, target_path, nlp_args=default_args):
+    def __init__(self, document_file, target_path, nlp_args=default_args, verbosity=0):
         """
         Initialize Distiller for specified document file.
         """
@@ -77,6 +78,8 @@ class Distiller():
         self.collocations = Collocations()
         self.positioning = Positioning()
         self.path = make_path(target_path)
+        logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
+                            level=self.get_logging_level(verbosity))
 
         with open(document_file) as d:
             self.jdata = json.load(d)
@@ -91,6 +94,7 @@ class Distiller():
         """
         Read args from json metadata and initialize Distiller arguments.
         """
+        logging.info("initializing Distiller")
         self.base_url = self.jdata['metadata']['base_url']
         self.documents = self.jdata['documents']
         self.normalize = nlp_args['normalize']
@@ -105,6 +109,7 @@ class Distiller():
         Run documents from json through pre-processing.
         """
         for document in self.documents:
+            logging.info("processing document {0}".format(document['id']))
             doc = {}
             doc['id'] = document['id']
             doc['url'] = self.base_url.format(int(document['id']))
@@ -126,6 +131,7 @@ class Distiller():
         Compute the statistics for each pre-processed document, given the entire body of docs.
         """
         for document in self.processed_documents.values():
+            logging.info("computing statistics for {0}".format(document['id']))
             document['tfidf'] = self.tfidf.compute_tf_idf(document['candidates'],
                                                            document['tokenized_body'],
                                                            self.processed_doc_bodies)
@@ -161,10 +167,24 @@ class Distiller():
         """
         Write all of the stats and processed documents out to the target path.
         """
+        logging.info("exporting statistics to {0}".format(self.path))
         export_statistic(self.path, self.processed_documents, 'keywords', lambda x: x[0], nltk.FreqDist)
         export_statistic(self.path, self.processed_documents, 'bigrams', lambda x: ' '.join(map(lambda y: y[0], x)), nltk.FreqDist)
         export_statistic(self.path, self.processed_documents, 'trigrams', lambda x: ' '.join(map(lambda y: y[0], x)), nltk.FreqDist)
         store_collections(self.path, self.processed_documents)
+
+    def get_logging_level(self, verbosity):
+        """
+        Return a logging level based on verbosity argument {0,1,2}.
+        """
+        if verbosity < 1:
+            return logging.ERROR
+        if verbosity == 1:
+            return logging.WARNING
+        if verbosity == 2:
+            return logging.INFO
+        if verbosity > 2:
+            return logging.DEBUG
 
 
 def export_statistic(path, docs, stat, transformer=lambda x: x, compiler=lambda x: x):
@@ -190,7 +210,7 @@ def store_collections(path, documents):
     """
     keymap = {}
     docmap = {}
-
+    logging.info("storing document and keyword collections to {0}".format(path))
     for doc in documents.values():
         docmap[doc['id']] = doc
         for word in doc['keywords']:

@@ -49,8 +49,8 @@ test_data = {
         ]
     }
 
-data = '../../data/data.json'
-result = '../../data/tests/'
+data = 'data/data.json'
+result = 'data/tests/'
 
 nlp_args = {
     'normalize': True,
@@ -75,13 +75,17 @@ class TestDistiller(unittest.TestCase):
     Basic testing for Distiller class.
     """
 
-    clean_folder(result)
-    Distiller(data, result, nlp_args)
-    assert os.path.exists(result + 'keymap.json')
-    assert os.path.exists(result + 'docmap.json')
-    assert os.path.exists(result + 'keywords.json')
-    assert os.path.exists(result + 'bigrams.json')
-    assert os.path.exists(result + 'trigrams.json')
+    def test_DistillerBasic(self):
+        """
+        Runs Distiller on test data.
+        """
+        clean_folder(result)
+        Distiller(data, result, nlp_args, verbosity=3)
+        assert os.path.exists(result + 'keymap.json')
+        assert os.path.exists(result + 'docmap.json')
+        assert os.path.exists(result + 'keywords.json')
+        assert os.path.exists(result + 'bigrams.json')
+        assert os.path.exists(result + 'trigrams.json')
 
 
 
