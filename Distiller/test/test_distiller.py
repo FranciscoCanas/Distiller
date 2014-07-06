@@ -75,9 +75,9 @@ class TestDistiller(unittest.TestCase):
     Basic testing for Distiller class.
     """
 
-    def test_DistillerBasic(self):
+    def test_DistillerOutputFiles(self):
         """
-        Runs Distiller on test data.
+        Runs Distiller on test data and checks that output files are produced.
         """
         clean_folder(result)
         Distiller(data, result, nlp_args, verbosity=3)
@@ -86,6 +86,14 @@ class TestDistiller(unittest.TestCase):
         assert os.path.exists(result + 'keywords.json')
         assert os.path.exists(result + 'bigrams.json')
         assert os.path.exists(result + 'trigrams.json')
+
+    def test_DistillerDocs(self):
+        """
+        Runs on test data and checks Distiller documents.
+        """
+        clean_folder(result)
+        d = Distiller(data, result, nlp_args, verbosity=3)
+
 
 
 

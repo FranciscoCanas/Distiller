@@ -87,7 +87,8 @@ class Distiller():
 
         self.initialize_arguments(nlp_args)
         self.process_documents()
-        self.compute_statistics()
+        self.extract_features()
+        self.compile()
         self.export()
 
     def initialize_arguments(self, nlp_args):
@@ -126,9 +127,9 @@ class Distiller():
 
         self.processed_doc_bodies = [document['processed_tokens'] for document in self.processed_documents.values()]
 
-    def compute_statistics(self):
+    def extract_features(self):
         """
-        Compute the statistics for each pre-processed document, given the entire body of docs.
+        Extract the features for each pre-processed document, given the entire body of docs.
         """
         for document in self.processed_documents.values():
             logging.info("computing statistics for {0}".format(document['id']))
@@ -148,7 +149,6 @@ class Distiller():
             document['trigrams'] = self.collocations.find_ngrams(2, document['processed_tokens'])
 
 
-
     def extract_keywords(self, tf_idf_scores, positioning_scores, lower_cutoff=0.0001):
         """
         Input: sorted list of tf-idf candidate scores
@@ -163,15 +163,51 @@ class Distiller():
                 keywords.append((candidate[0], score))
         return keywords
 
+    def compile(self):
+        """
+        Compile the statistics of all extracted features.
+        """
+        self.compile_statistic(self.processed_documents, 'keywords', lambda x: x[0], nltk.FreqDist)
+        self.compile_statistic(self.processed_documents, 'bigrams', lambda x: ' '.join(map(lambda y: y[0], x)), nltk.FreqDist)
+        self.compile_statistic(self.processed_documents, 'trigrams', lambda x: ' '.join(map(lambda y: y[0], x)), nltk.FreqDist)
+        self.compile_collections(self.processed_documents)
+
     def export(self):
         """
         Write all of the stats and processed documents out to the target path.
         """
         logging.info("exporting statistics to {0}".format(self.path))
-        export_statistic(self.path, self.processed_documents, 'keywords', lambda x: x[0], nltk.FreqDist)
-        export_statistic(self.path, self.processed_documents, 'bigrams', lambda x: ' '.join(map(lambda y: y[0], x)), nltk.FreqDist)
-        export_statistic(self.path, self.processed_documents, 'trigrams', lambda x: ' '.join(map(lambda y: y[0], x)), nltk.FreqDist)
-        store_collections(self.path, self.processed_documents)
+        for key, value in self.statistics.items():
+            export_to_file(self.path, key, value)
+
+        export_to_file(self.path, 'keymap', self.keymap)
+        export_to_file(self.path, 'docmap', self.docmap)
+
+    def compile_statistic(self, docs, stat, transformer=lambda x: x, compiler=lambda x: x):
+        """
+        Creates a json output file for the given stat and set of bugs.
+        """
+        stats = []
+        for doc in docs.values():
+            for item in doc[stat]:
+                stats.append(transformer(item))
+        self.statistics[stat] = compiler(stats)
+
+    def compile_collections(self, documents):
+        """
+        Stores the collections:
+        (keyword => [BZ id, ...])
+        (BZ id => Bug)
+        """
+        self.keymap = {}
+        self.docmap = {}
+        logging.info("storing document and keyword collections to {0}".format(self.path))
+        for doc in documents.values():
+            self.docmap[doc['id']] = doc
+            for word in doc['keywords']:
+                if not self.keymap.has_key(word[0]):
+                    self.keymap[word[0]] = []
+                self.keymap[word[0]].append(str(doc['id']))
 
     def get_logging_level(self, verbosity):
         """
@@ -187,44 +223,15 @@ class Distiller():
             return logging.DEBUG
 
 
-def export_statistic(path, docs, stat, transformer=lambda x: x, compiler=lambda x: x):
+
+def export_to_file(path, stat, col):
     """
-    Creates a json output file for the given stat and set of bugs.
+    Export the given stat to file in the given path.
     """
-    stats = []
-    for doc in docs.values():
-        for item in doc[stat]:
-            stats.append(transformer(item))
-    processed_statistic = compiler(stats)
     with open(path + '/' + stat + '.json', 'w') as outfile:
-        json.dump(processed_statistic, outfile)
+        json.dump(col, outfile)
     outfile.close()
 
-
-
-def store_collections(path, documents):
-    """
-    Stores the collections:
-    (keyword => [BZ id, ...])
-    (BZ id => Bug)
-    """
-    keymap = {}
-    docmap = {}
-    logging.info("storing document and keyword collections to {0}".format(path))
-    for doc in documents.values():
-        docmap[doc['id']] = doc
-        for word in doc['keywords']:
-            if not keymap.has_key(word[0]):
-                keymap[word[0]] = []
-            keymap[word[0]].append(str(doc['id']))
-
-    with open(path + '/keymap.json', 'w') as outfile:
-        json.dump(keymap, outfile)
-    outfile.close()
-
-    with open(path + '/docmap.json', 'w') as outfile:
-        json.dump(docmap, outfile)
-    outfile.close()
 
 def make_path(path):
     """
