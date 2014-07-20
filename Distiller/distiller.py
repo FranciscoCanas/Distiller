@@ -121,7 +121,10 @@ class Distiller():
                                                      normalize=self.normalize,
                                                      stem=self.stem,
                                                      lemmatize=self.lemmatize)
-            doc['candidates'] = list(set(zip(*doc['processed_tokens'])[0]))
+            if not doc['processed_tokens']:
+                doc['candidates'] = []
+            else:
+                doc['candidates'] = list(set(zip(*doc['processed_tokens'])[0]))
             doc['freq_distribution'] = nltk.FreqDist(doc['tokenized_body'])
             self.processed_documents[doc['id']] = doc
 
