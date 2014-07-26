@@ -6,7 +6,7 @@ import nltk
 from features.Collocations import Collocations
 from features.Positioning import Positioning
 from features.tf_idf import tf_idf
-from preprocessing.pipeline import pre_process_pipeline
+from preprocessing.pipeline import Pipeline
 
 
 
@@ -109,18 +109,19 @@ class Distiller():
         """
         Run documents from json through pre-processing.
         """
+        pipeline = Pipeline(black_list=self.black_list,
+                            pos_list=self.pos_list,
+                            normalize=self.normalize,
+                            stem=self.stem,
+                            lemmatize=self.lemmatize)
+
         for document in self.documents:
             logging.info("processing document {0}".format(document['id']))
             doc = {}
             doc['id'] = document['id']
             doc['url'] = self.base_url.format(int(document['id']))
             doc['tokenized_body'] = map(unicode.lower, nltk.word_tokenize(document['body']))
-            doc['processed_tokens'] = pre_process_pipeline(text=document['body'],
-                                                     black_list=self.black_list,
-                                                     pos_list=self.pos_list,
-                                                     normalize=self.normalize,
-                                                     stem=self.stem,
-                                                     lemmatize=self.lemmatize)
+            doc['processed_tokens'] = pipeline.pre_process(text=document['body'])
             if not doc['processed_tokens']:
                 doc['candidates'] = []
             else:
