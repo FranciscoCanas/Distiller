@@ -5,7 +5,7 @@ import nltk
 
 from features.Collocations import Collocations
 from features.Positioning import Positioning
-from features.tf_idf import tf_idf
+from features.tf_idf import TF_IDF
 from preprocessing.pipeline import Pipeline
 
 
@@ -68,13 +68,12 @@ class Distiller():
         'black_list': []            # token list used to filter out from candidates
     }
 
-    def __init__(self, document_file, target_path, nlp_args=default_args, verbosity=0):
+    def __init__(self, document_file, target_path, nlp_args=default_args, verbosity=2):
         """
         Initialize Distiller for specified document file.
         """
         self.processed_documents = {}
         self.statistics = {}
-        self.tfidf = tf_idf()
         self.collocations = Collocations()
         self.positioning = Positioning()
         self.path = make_path(target_path)
@@ -87,6 +86,7 @@ class Distiller():
 
         self.initialize_arguments(nlp_args)
         self.process_documents()
+        self.tfidf = TF_IDF(self.processed_doc_bodies)
         self.extract_features()
         self.compile()
         self.export()
@@ -137,9 +137,8 @@ class Distiller():
         """
         for document in self.processed_documents.values():
             logging.info("computing statistics for {0}".format(document['id']))
-            document['tfidf'] = self.tfidf.compute_tf_idf(document['candidates'],
-                                                           document['tokenized_body'],
-                                                           self.processed_doc_bodies)
+            document['tfidf'] = self.tfidf.compute(document['candidates'],
+                                                           document['tokenized_body'])
 
             document['positioning'] = self.positioning.compute_position_score(document['candidates'],
                                                                               document['tokenized_body'])

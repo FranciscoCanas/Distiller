@@ -57,7 +57,7 @@ nlp_args = {
     'stem': False,
     'lemmatize': False,
     'tfidf_cutoff': 0.0001,
-    'pos_list': ['NN','NP'],
+    'pos_list': ['NN','NP', 'JJ'],
     'black_list': []
 }
 
