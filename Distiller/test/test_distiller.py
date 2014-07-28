@@ -81,18 +81,24 @@ class TestDistiller(unittest.TestCase):
         """
         clean_folder(result)
         Distiller(data, result, nlp_args, verbosity=3)
-        assert os.path.exists(result + 'keymap.json')
-        assert os.path.exists(result + 'docmap.json')
-        assert os.path.exists(result + 'keywords.json')
-        assert os.path.exists(result + 'bigrams.json')
-        assert os.path.exists(result + 'trigrams.json')
+        self.assertTrue(os.path.exists(result + 'keymap.json'))
+        self.assertTrue(os.path.exists(result + 'docmap.json'))
+        self.assertTrue(os.path.exists(result + 'keywords.json'))
+        self.assertTrue(os.path.exists(result + 'bigrams.json'))
+        self.assertTrue(os.path.exists(result + 'trigrams.json'))
 
     def test_DistillerDocs(self):
         """
-        Runs on test data and checks Distiller documents.
+        Runs on test data and checks that all stats are collected.
         """
         clean_folder(result)
         d = Distiller(data, result, nlp_args, verbosity=3)
+        self.assertTrue(d.processed_documents)
+        self.assertTrue(d.statistics)
+        self.assertTrue(d.statistics['keywords'])
+        self.assertTrue(d.statistics['bigrams'])
+        self.assertTrue(d.statistics['trigrams'])
+
 
 
 

@@ -170,10 +170,10 @@ class Distiller():
         """
         Compile the statistics of all extracted features.
         """
-        self.compile_statistic(self.processed_documents, 'keywords', lambda x: x[0], nltk.FreqDist)
-        self.compile_statistic(self.processed_documents, 'bigrams', lambda x: ' '.join(map(lambda y: y[0], x)), nltk.FreqDist)
-        self.compile_statistic(self.processed_documents, 'trigrams', lambda x: ' '.join(map(lambda y: y[0], x)), nltk.FreqDist)
-        self.compile_collections(self.processed_documents)
+        self.compile_statistic('keywords', lambda x: x[0], nltk.FreqDist)
+        self.compile_statistic('bigrams', lambda x: ' '.join(map(lambda y: y[0], x)), nltk.FreqDist)
+        self.compile_statistic('trigrams', lambda x: ' '.join(map(lambda y: y[0], x)), nltk.FreqDist)
+        self.compile_collections()
 
     def export(self):
         """
@@ -186,17 +186,17 @@ class Distiller():
         export_to_file(self.path, 'keymap', self.keymap)
         export_to_file(self.path, 'docmap', self.docmap)
 
-    def compile_statistic(self, docs, stat, transformer=lambda x: x, compiler=lambda x: x):
+    def compile_statistic(self, stat, transformer=lambda x: x, compiler=lambda x: x):
         """
         Creates a json output file for the given stat and set of bugs.
         """
         stats = []
-        for doc in docs.values():
+        for doc in self.processed_documents.values():
             for item in doc[stat]:
                 stats.append(transformer(item))
         self.statistics[stat] = compiler(stats)
 
-    def compile_collections(self, documents):
+    def compile_collections(self):
         """
         Stores the collections:
         (keyword => [BZ id, ...])
@@ -205,7 +205,7 @@ class Distiller():
         self.keymap = {}
         self.docmap = {}
         logging.info("storing document and keyword collections to {0}".format(self.path))
-        for doc in documents.values():
+        for doc in self.processed_documents.values():
             self.docmap[doc['id']] = doc
             for word in doc['keywords']:
                 if not self.keymap.has_key(word[0]):
