@@ -1,2 +1,11 @@
-v0.1.1, 2014-06-20 -- Package reorganization, test data, basic test added.
-v0.1, 2014-06-19 -- Initial Release.
+v0.1.2, 2014-08-13
+    - Added logging and verbosity to public methods.
+    - Internal code changes for processing pipeline and feature extraction.
+
+v0.1.1, 2014-06-20 
+    - Package reorganization
+    - Test data added.
+    - Basic tests added.
+
+v0.1, 2014-06-19 
+    - Initial Release.
