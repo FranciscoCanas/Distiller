@@ -22,6 +22,7 @@ class Distiller():
         }
     documents : [{
         id: INT,
+        description: "..." # optional
         body: "...",
         }, ...],
     }
@@ -122,7 +123,8 @@ class Distiller():
                 'id': document['id'],
                 'url': self.base_url.format(int(document['id'])),
                 'tokenized_body': map(unicode.lower, nltk.word_tokenize(document['body'])),
-                'processed_tokens': pipeline.pre_process(text=document['body'])
+                'processed_tokens': pipeline.pre_process(text=document['body']),
+                'description': document.get('description', '')
             }
 
             if not doc['processed_tokens']:

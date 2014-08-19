@@ -59,6 +59,7 @@ Path to file containing the document collection in JSON format.
                 {
                     'id': 'The document's unique identifier (if any)',
                     'body': 'The entire body of the document in a single text blob.',
+                    'description': 'An optional brief description of this doc.'
                 }, ...
             ]
     }
